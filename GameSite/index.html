@@ -1,554 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Barnacle</title>
-  <link rel="icon" href="../7xXvLp1.webp" type="image/x-icon"/>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
+    <meta charset="UTF-8">
+    <title>Barnacle</title>
+    <link rel="icon" href="../7xXvLp1.webp" type="image/x-icon" />
 
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap" rel="stylesheet">
 
-    :root {
-      --bg:       #1a1714;
-      --surface:  #221f1b;
-      --rim:      #2e2b26;
-      --text-dim: #6a6560;
-      --paper-y:  #f5edc2;
-      --paper-g:  #d4ecce;
-      --paper-b:  #ccdff5;
-      --paper-p:  #e8d4f0;
-      --paper-o:  #f5d9b8;
-      --paper-r:  #f5cece;
-      --line:     rgba(120,140,200,.22);
-      --margin:   rgba(220, 80, 80, .55);
-    }
+    <!-- CSS -->
+    <style>
+        :root {
+            --purple: rgb(123, 31, 162);
+            --violet: rgb(103, 58, 183);
+            --pink: rgb(244, 143, 177);
+        }
 
-    html { min-height: 100%; }
+        body {
+            background-color: #191919;
+            margin: 0px;
+            overflow: auto;
+            user-select: none;
+            font-family: 'Montserrat', sans-serif;
+            color: #F9F6EF;
+            display: grid;
+            place-content: center;
+        }
 
-    body {
-      background-color: var(--bg);
-      /* cork-ish texture via layered noise */
-      background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.07'/%3E%3C/svg%3E");
-      background-size: 300px 300px;
-      min-height: 100vh;
-      font-family: 'Courier Prime', monospace;
-      color: #e8e0d0;
-    }
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
 
-    /* ─── HEADER ─── */
-    header {
-      padding: 3.5rem 2.5rem 2rem;
-      position: relative;
-    }
+        h1 {
+            color: white;
+            font-family: "Rubik", sans-serif;
+            font-size: clamp(2em, 2vw, 4em);
+            font-weight: 400;
+            margin: 0px;
+            padding: 150px;
+            text-align: center;
+        }
 
-    .header-inner {
-      max-width: 1300px;
-      margin: 0 auto;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 2rem;
-      flex-wrap: wrap;
-    }
+        h1>.magic {
+            display: inline-block;
+            position: relative;
+        }
 
-    .logo-block {
-      position: relative;
-    }
+        h1>.magic>.magic-text {
+            background: linear-gradient(to right, var(--purple), var(--violet), var(--pink), var(--purple));
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+            animation: background-pan 3s linear infinite;
+        }
 
-    /* logo looks like a big notepad label taped to the board */
-    .logo-tape {
-      position: absolute;
-      top: -14px; left: 50%;
-      transform: translateX(-50%) rotate(-1deg);
-      width: 80px; height: 22px;
-      background: rgba(255,255,200,.18);
-      border-radius: 2px;
-      backdrop-filter: blur(2px);
-    }
+        @keyframes background-pan {
+            from {
+                background-position: 0% center;
+            }
 
-    h1 {
-      font-family: 'Caveat', cursive;
-      font-weight: 700;
-      font-size: clamp(3.8rem, 9vw, 7rem);
-      line-height: 1;
-      color: #f0e8d0;
-      letter-spacing: -.02em;
-      text-shadow: 3px 3px 0 rgba(0,0,0,.5), 0 0 40px rgba(255,220,120,.08);
-      position: relative;
-    }
+            to {
+                background-position: -200% center;
+            }
+        }
 
-    .tagline {
-      font-size: .78rem;
-      color: var(--text-dim);
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      margin-top: .4rem;
-    }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .live-dot {
-      display: inline-block;
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: #6fcf6f;
-      margin-right: 6px;
-      animation: breathe 2.4s ease-in-out infinite;
-      vertical-align: middle;
-    }
-    @keyframes breathe {
-      0%,100% { opacity: 1; box-shadow: 0 0 0 0 #6fcf6f66; }
-      50% { opacity: .7; box-shadow: 0 0 0 5px transparent; }
-    }
+        .button-container button {
+            flex-basis: calc(33.33% - 10px);
+            margin: 5px;
+            padding: 10px;
+            border: none;
+            border-radius: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-size: 15px;
+            box-shadow: 0px 0px 5px rgba(84, 78, 78, 0.8);
+            background-color: #242424;
+            font-weight: normal;
+            color: #7d7d7d;
+            width: max(15vh, 35vh);
+            text-align: center;
+            transition: transform 0.2s;
+        }
 
-    /* ─── CONTROLS ─── */
-    .controls {
-      max-width: 1300px;
-      margin: 0 auto 2.5rem;
-      padding: 0 2.5rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: center;
-    }
+        .button-container button:active {
+            transform: scale(0.95);
+        }
 
-    /* search looks like a torn notepad strip */
-    .search-strip {
-      position: relative;
-      background: #f5edc2;
-      border-radius: 2px;
-      box-shadow: 2px 3px 12px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.3);
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    /* ruled lines on the search strip */
-    .search-strip::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px, transparent 19px,
-        var(--line) 19px, var(--line) 20px
-      );
-      pointer-events: none;
-    }
-    /* red margin */
-    .search-strip::before {
-      content: '';
-      position: absolute;
-      top: 0; bottom: 0;
-      left: 28px;
-      width: 1.5px;
-      background: var(--margin);
-      z-index: 2;
-      pointer-events: none;
-    }
+        @media (max-width: 768px) {
+            .button-container button {
+                flex-basis: calc(50% - 10px);
+            }
+        }
 
-    #search {
-      display: block;
-      width: 240px;
-      background: transparent;
-      border: none;
-      outline: none;
-      font-family: 'Caveat', cursive;
-      font-size: 1.15rem;
-      color: #2a2520;
-      padding: .55rem .9rem .55rem 2.4rem;
-      position: relative;
-      z-index: 3;
-    }
-    #search::placeholder { color: #a09580; }
+        @media (max-width: 480px) {
+            .button-container button {
+                flex-basis: calc(100% - 10px);
+            }
+        }
 
-    /* filter pills look like paper flag tabs */
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .5rem;
-    }
+        @media (min-width: 1920px) {
+            .button-container button {
+                flex-basis: calc(20% - 10px);
+            }
+        }
 
-    .filter-btn {
-      background: var(--rim);
-      border: 1.5px solid #3a3630;
-      color: var(--text-dim);
-      font-family: 'Caveat', cursive;
-      font-size: .95rem;
-      padding: .3rem .9rem;
-      border-radius: 2px;
-      cursor: pointer;
-      transition: all .18s;
-      line-height: 1.4;
-      position: relative;
-    }
-    .filter-btn::before {
-      content: attr(data-label);
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .filter-btn:hover {
-      border-color: #7a7060;
-      color: #d0c8b0;
-      transform: translateY(-1px);
-    }
-    .filter-btn.active {
-      background: #f5edc2;
-      color: #2a2520;
-      border-color: #c8b870;
-      box-shadow: 1px 2px 8px rgba(0,0,0,.4);
-    }
+        @media (min-width: 3840px) {
+            .button-container button {
+                flex-basis: calc(15% - 10px);
+            }
+        }
 
-    .game-count {
-      font-size: .75rem;
-      color: var(--text-dim);
-      letter-spacing: .1em;
-      margin-left: auto;
-    }
-    .game-count strong { color: #c8b870; font-size: 1rem; font-family: 'Caveat', cursive; }
+        #game-search {
+            width: 60vh;
+            padding: 10px;
+            font-size: 15px;
+            background-color: #242424;
+            border: none;
+            color: #7d7d7d;
+            box-shadow: 0px 0px 5px rgba(84, 78, 78, 0.8);
+            margin: 1vh auto 3vh auto;
+            display: block;
+        }
 
-    /* ─── BOARD ─── */
-    .board {
-      max-width: 1340px;
-      margin: 0 auto;
-      padding: 0 2rem 5rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
-      gap: 1.6rem;
-    }
-
-    /* ─── NOTE CARD ─── */
-    .note {
-      position: relative;
-      border-radius: 2px;
-      cursor: pointer;
-      transition: transform .2s ease, box-shadow .2s ease;
-      will-change: transform;
-    }
-
-    /* staggered rotations — feels hand-pinned */
-    .note:nth-child(7n+1)  { transform: rotate(-2.1deg); }
-    .note:nth-child(7n+2)  { transform: rotate( 1.4deg); }
-    .note:nth-child(7n+3)  { transform: rotate(-0.7deg); }
-    .note:nth-child(7n+4)  { transform: rotate( 2.3deg); }
-    .note:nth-child(7n+5)  { transform: rotate(-1.6deg); }
-    .note:nth-child(7n+6)  { transform: rotate( 0.5deg); }
-    .note:nth-child(7n+7)  { transform: rotate(-1.1deg); }
-
-    .note:hover {
-      transform: rotate(0deg) scale(1.06) !important;
-      z-index: 10;
-    }
-
-    /* paper per category */
-    .note[data-cat="action"]     { --paper: var(--paper-r); }
-    .note[data-cat="casual"]     { --paper: var(--paper-y); }
-    .note[data-cat="idle"]       { --paper: var(--paper-g); }
-    .note[data-cat="puzzle"]     { --paper: var(--paper-b); }
-    .note[data-cat="horror"]     { --paper: var(--paper-p); }
-    .note[data-cat="platformer"] { --paper: var(--paper-o); }
-
-    .note-inner {
-      background: var(--paper);
-      border-radius: 2px;
-      overflow: hidden;
-      box-shadow:
-        3px 5px 18px rgba(0,0,0,.55),
-        inset 0 1px 0 rgba(255,255,255,.45);
-      position: relative;
-    }
-
-    /* ruled lines */
-    .note-inner::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px, transparent 23px,
-        rgba(100,120,180,.2) 23px, rgba(100,120,180,.2) 24px
-      );
-      pointer-events: none;
-    }
-
-    /* red margin line */
-    .note-inner::before {
-      content: '';
-      position: absolute;
-      top: 0; bottom: 0;
-      left: 32px;
-      width: 1.5px;
-      background: rgba(210,70,70,.5);
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    /* hole punch at top */
-    .hole {
-      position: absolute;
-      top: 10px; left: 50%;
-      transform: translateX(-50%);
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      background: var(--bg);
-      border: 1.5px solid rgba(0,0,0,.25);
-      z-index: 5;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,.4);
-    }
-
-    /* pushpin */
-    .pin {
-      position: absolute;
-      top: -6px; left: 50%;
-      transform: translateX(-50%);
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #ff8080, #b02020);
-      box-shadow: 0 2px 6px rgba(0,0,0,.6), inset 0 1px 2px rgba(255,255,255,.3);
-      z-index: 6;
-    }
-    /* only every 4th card gets a pin instead of hole */
-    .note:nth-child(4n) .hole { display: none; }
-    .note:not(:nth-child(4n)) .pin { display: none; }
-
-    .note-content {
-      padding: 2rem .9rem .9rem 2.3rem;
-      position: relative;
-      z-index: 3;
-      min-height: 130px;
-      display: flex;
-      flex-direction: column;
-      gap: .35rem;
-    }
-
-    .note-icon {
-      font-size: 1.7rem;
-      line-height: 1;
-      filter: drop-shadow(1px 1px 0 rgba(0,0,0,.2));
-    }
-
-    .note-name {
-      font-family: 'Caveat', cursive;
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: #1e1a14;
-      line-height: 1.25;
-      margin-top: .2rem;
-    }
-
-    .note-cat {
-      font-family: 'Courier Prime', monospace;
-      font-size: .6rem;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: rgba(40,30,20,.45);
-      margin-top: auto;
-      padding-top: .6rem;
-    }
-
-    /* tape strip across top of some cards */
-    .tape {
-      position: absolute;
-      top: -10px; left: 50%;
-      transform: translateX(-50%) rotate(-0.5deg);
-      width: 60px; height: 20px;
-      background: rgba(255,255,200,.22);
-      border-radius: 2px;
-      z-index: 7;
-      pointer-events: none;
-    }
-    /* not every card gets tape */
-    .note:not(:nth-child(5n+2)) .tape { display: none; }
-    .note:nth-child(4n) .tape { display: none; }
-
-    /* ─── EMPTY ─── */
-    .empty-msg {
-      display: none;
-      grid-column: 1/-1;
-      text-align: center;
-      padding: 5rem 1rem;
-      color: var(--text-dim);
-    }
-    .empty-msg span {
-      font-family: 'Caveat', cursive;
-      font-size: 2rem;
-      display: block;
-      margin-bottom: .5rem;
-      color: #4a4540;
-    }
-
-    /* ─── FOOTER ─── */
-    footer {
-      text-align: center;
-      padding: 2rem;
-      font-size: .7rem;
-      color: var(--text-dim);
-      letter-spacing: .12em;
-    }
-
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 600px) {
-      h1 { font-size: 3.5rem; }
-      .board { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1.2rem; }
-      header { padding: 2.5rem 1.5rem 1.5rem; }
-      .controls { padding: 0 1.5rem; }
-      .board { padding-inline: 1.5rem; }
-    }
-  </style>
+        #game-search::placeholder {
+            color: #555;
+        }
+    </style>
 </head>
+
 <body>
 
-<header>
-  <div class="header-inner">
-    <div class="logo-block">
-      <div class="logo-tape"></div>
-      <h1>Barnacle</h1>
-      <p class="tagline"><span class="live-dot"></span>made by a student, for students</p>
+    <h1>Made by a student, for students.
+        <span class="magic">
+            <span class="magic-text">Barnacle</span>
+        </span>
+    </h1>
+
+    <!-- Search bar -->
+    <input type="text" id="game-search" placeholder="Type to search..." />
+
+    <!-- Buttons -->
+    <div class="button-container">
+        <button data-action="action1">Bitlife</button>
+        <button data-action="action2">1v1.lol</button>
+        <button data-action="action3">Among us</button>
+        <button data-action="action4">atr3</button>
+        <button data-action="action5">slope</button>
+        <button data-action="action7">ClumsyBird</button>
+        <button data-action="action8">Cookie clicker</button>
+        <button data-action="action9">Tetris</button>
+        <button data-action="action10">Save the doge</button>
+        <button data-action="action14">Pacman</button>
+        <button data-action="action16">Bee swarm Simulator</button>
+        <button data-action="action18">minecraft 1.8.8</button>
+        <button data-action="action19">Geometry dash</button>
+        <button data-action="action20">Crossy Road</button>
+        <button data-action="action22">Subway Surfers</button>
+        <button data-action="action23">Tic Tac Toe</button>
+        <button data-action="action24">Chrome offline dinoscar game</button>
+        <button data-action="action26">3d.city</button>
+        <button data-action="action27">Particle clicker</button>
+        <button data-action="action28">The house game</button>
+        <button data-action="action29">Cube engine</button>
+        <button data-action="action30">URL chess</button>
+        <button data-action="action31">Asteroid game</button>
+        <button data-action="action32">Puzzle maker</button>
+        <button data-action="action33">Anime clicker</button>
+        <button data-action="action34">Doge miner</button>
+        <button data-action="action35">Slope 2</button>
+        <button data-action="action36">Getting over it</button>
+        <button data-action="action67">Baldi's basics revamped</button>
+        <button data-action="action38">Tower game</button>
+        <button data-action="action39">Stickman hook</button>
+        <button data-action="action40">Worlds hardest game</button>
+        <button data-action="action41">Bob the robber</button>
+        <button data-action="action42">Bedwars</button>
+        <button data-action="action43">Fifa 17 pack opener</button>
+        <button data-action="action44">Pet simulator x</button>
+        <button data-action="action45">Playlist cover maker</button>
+        <button data-action="action46">Blockblast</button>
+        <button data-action="action47">Birthday guesser</button>
+        <button data-action="action48">R.E.P.O</button>
+        <button data-action="action50">Bendy the ink machine</button>
+        <button data-action="action52">BloodMoney</button>
+        <button data-action="action53">Buckshot roulette</button>
+        <button data-action="action54">Class of 09</button>
+        <button data-action="action55">Getting of it</button>
+        <button data-action="action56">Hollow Knight</button>
+        <button data-action="action57">People playground</button>
+        <button data-action="action58">Pizza tower</button>
+        <button data-action="action59">Undertale yellow (fanmade-prequel)</button>
+        <button data-action="action60">Bad Parenting</button>
+        <button data-action="action62">Cup Head</button>
+        <button data-action="action63">FNF</button>
+        <button data-action="action64">Milkman Karlson</button>
+        <button data-action="action65">Rocket League (shit version)</button>
+        <button data-action="action66">Superhot</button>
+        <button data-action="action676776">Ultrakill</button>
+        <button data-action="bazinga2">Adventures with anxiety</button>
+        <button data-action="Myfavouritegame">Oneshot</button>
     </div>
-  </div>
-</header>
 
-<div class="controls">
-  <div class="search-strip">
-    <input id="search" type="text" placeholder="search games..." autocomplete="off" spellcheck="false"/>
-  </div>
-  <div class="filters">
-    <button class="filter-btn active" data-cat="all">All</button>
-    <button class="filter-btn" data-cat="action">Action</button>
-    <button class="filter-btn" data-cat="casual">Casual</button>
-    <button class="filter-btn" data-cat="platformer">Platformer</button>
-    <button class="filter-btn" data-cat="puzzle">Puzzle</button>
-    <button class="filter-btn" data-cat="idle">Idle</button>
-    <button class="filter-btn" data-cat="horror">Horror</button>
-  </div>
-  <div class="game-count"><strong id="count">0</strong> notes</div>
-</div>
+    <!-- JS -->
+    <script>
+        const buttons = document.querySelectorAll(".button-container button");
+        const searchInput = document.getElementById("game-search");
+        const buttonContainer = document.querySelector(".button-container");
+        const allButtons = Array.from(buttonContainer.querySelectorAll("button"));
 
-<main class="board" id="board"></main>
-<div class="board"><p class="empty-msg" id="empty"><span>¯\_(ツ)_/¯</span>nothing matches that</p></div>
+        function sortButtons(buttons) {
+            return buttons.sort((a, b) => a.textContent.trim().localeCompare(b.textContent.trim()));
+        }
 
-<footer>barnacle &mdash; no installs, no accounts, just games</footer>
+        searchInput.addEventListener("input", () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredButtons = allButtons.filter(btn => btn.textContent.toLowerCase().includes(searchTerm));
+            buttonContainer.innerHTML = "";
+            sortButtons(filteredButtons).forEach(btn => buttonContainer.appendChild(btn));
+        });
 
-<script>
-const GAMES = [
-  { name:"Bitlife",                  icon:"🧬", cat:"casual",     url:"/Games/Bitlife/index.html" },
-  { name:"1v1.lol",                  icon:"🎯", cat:"action",     url:"/Games/1v1.lol/index.html" },
-  { name:"Among Us",                 icon:"👾", cat:"casual",     url:"/Games/Amongus/index.html" },
-  { name:"ATR3",                     icon:"🏎️", cat:"action",     url:"/Games/atr3/index.html" },
-  { name:"Slope",                    icon:"🔵", cat:"action",     url:"/Games/slope/index.html" },
-  { name:"Clumsy Bird",              icon:"🐦", cat:"casual",     url:"/Games/clumsy-bird-master/index.html" },
-  { name:"Cookie Clicker",           icon:"🍪", cat:"idle",       url:"/Games/Cookie-Clicker-Source-Code-master/index.html" },
-  { name:"Tetris",                   icon:"🟦", cat:"puzzle",     url:"/Games/canvas-tetris-master/canvas-tetris-master/index.html" },
-  { name:"Save the Doge",            icon:"🐕", cat:"casual",     url:"/Games/Dog/index.html" },
-  { name:"Pac-Man",                  icon:"🟡", cat:"action",     url:"/Games/pm.html" },
-  { name:"Bee Swarm Simulator",      icon:"🐝", cat:"idle",       url:"/Games/Bee-Swarm-Simulator/index.html" },
-  { name:"Minecraft",                icon:"⛏️", cat:"casual",     url:"/Games/mc.html" },
-  { name:"Geometry Dash",            icon:"🔷", cat:"platformer", url:"/Games/geodash.html" },
-  { name:"Crossy Road",              icon:"🐔", cat:"casual",     url:"/Games/CrossyRoad/index.html" },
-  { name:"Subway Surfers",           icon:"🛹", cat:"action",     url:"/Games/Subway/index.html" },
-  { name:"Tic Tac Toe",              icon:"❌", cat:"puzzle",     url:"/Games/tic tac toe/index.html" },
-  { name:"Chrome Dino",              icon:"🦖", cat:"action",     url:"/Games/dino.html" },
-  { name:"3D City",                  icon:"🏙️", cat:"casual",     url:"/Games/3d.city/index.html" },
-  { name:"Particle Clicker",         icon:"⚛️", cat:"idle",       url:"/Games/particleclicker/index.html" },
-  { name:"The House Game",           icon:"🏚️", cat:"horror",     url:"/Games/Thehousegame/the-house-game-gh-pages/index.html" },
-  { name:"Cube Engine",              icon:"🧊", cat:"casual",     url:"/Games/Cube-engine-master/play.htm" },
-  { name:"URL Chess",                icon:"♟️", cat:"puzzle",     url:"/Games/URLchess-master/index.html" },
-  { name:"Asteroids",                icon:"🌑", cat:"action",     url:"/Games/asteroids-game-master/index.html" },
-  { name:"Puzzle Maker",             icon:"🧩", cat:"puzzle",     url:"/Games/Fifteen_puzzle_maker-main/index.html" },
-  { name:"Anime Clicker",            icon:"⚡", cat:"idle",       url:"/Games/Anime-Clicker-1.0.2-master/index.html" },
-  { name:"Doge Miner",               icon:"🐶", cat:"idle",       url:"/Games/doge miner/index.html" },
-  { name:"Slope 2",                  icon:"🌀", cat:"action",     url:"/Games/Slope 2/index.html" },
-  { name:"Getting Over It",          icon:"🪣", cat:"platformer", url:"/Upgraded/getting-over-it/index.html" },
-  { name:"Baldi's Basics Revamped",  icon:"📏", cat:"horror",     url:"/Upgraded/baldi-remaster/index.html" },
-  { name:"Tower Game",               icon:"🏗️", cat:"casual",     url:"/Games/tower_game-master/index.html" },
-  { name:"Stickman Hook",            icon:"🕸️", cat:"platformer", url:"/Games/Stickman-Hook/index.html" },
-  { name:"World's Hardest Game",     icon:"💀", cat:"action",     url:"/Games/Worlds-Hardest-Game/index.html" },
-  { name:"Bob the Robber",           icon:"🕵️", cat:"action",     url:"/Games/bob-the-robber-2/index.html" },
-  { name:"Bedwars",                  icon:"🛏️", cat:"action",     url:"/Games/Bedwars.html" },
-  { name:"FIFA 17 Pack Opener",      icon:"⚽", cat:"casual",     url:"/Games/fifa17packopener.html" },
-  { name:"Pet Simulator X",          icon:"🐾", cat:"idle",       url:"/Games/psx.html" },
-  { name:"Playlist Maker",           icon:"🎵", cat:"casual",     url:"/Games/playlists-generator-main/index.html" },
-  { name:"Block Blast",              icon:"🟥", cat:"puzzle",     url:"/Games/blockblast.html" },
-  { name:"Birthday Guesser",         icon:"🎂", cat:"casual",     url:"/Games/birthdayguesser.html" },
-  { name:"R.E.P.O",                  icon:"👻", cat:"horror",     url:"https://xxpwnxxx420lord.github.io/b2/repo.html" },
-  { name:"Bendy & Ink Machine",      icon:"🖋️", cat:"horror",     url:"/Upgraded/bendy/index.html" },
-  { name:"Blood Money",              icon:"💸", cat:"action",     url:"/Upgraded/bloodmoney/index.html" },
-  { name:"Buckshot Roulette",        icon:"🔫", cat:"horror",     url:"/Upgraded/buckshot-roulette/index.html" },
-  { name:"Class of '09",             icon:"🏫", cat:"casual",     url:"/Upgraded/class-of-09" },
-  { name:"Hollow Knight",            icon:"🦋", cat:"platformer", url:"/Upgraded/hollow knight" },
-  { name:"People Playground",        icon:"🧍", cat:"casual",     url:"http://xxpwnxxx420lord.github.io/b2/PeoplePlaygroundBetter.html" },
-  { name:"Pizza Tower",              icon:"🍕", cat:"platformer", url:"/Upgraded/pizza tower" },
-  { name:"Undertale Yellow",         icon:"💛", cat:"platformer", url:"/Upgraded/undertale-yellow" },
-  { name:"Bad Parenting",            icon:"👨‍👦",cat:"casual",    url:"/Games/bad parenting/index.html" },
-  { name:"Cuphead",                  icon:"☕", cat:"platformer", url:"https://xxpwnxxx420lord.github.io/Barnical-Extended-Games/Cup/index.html" },
-  { name:"FNF",                      icon:"🎤", cat:"casual",     url:"https://xxpwnxxx420lord.github.io/Barnical-Extended-Games/FNF/index.html" },
-  { name:"Milkman Karlson",          icon:"🥛", cat:"action",     url:"https://xxpwnxxx420lord.github.io/Barnical-Extended-Games/Milkson-Karlson/index.html" },
-  { name:"Rocket League",            icon:"🚗", cat:"action",     url:"https://xxpwnxxx420lord.github.io/Barnical-Extended-Games/rocket-league/index.html" },
-  { name:"Superhot",                 icon:"🔴", cat:"action",     url:"https://xxpwnxxx420lord.github.io/Barnical-Extended-Games/superhot/index.html" },
-  { name:"ULTRAKILL",                icon:"🩸", cat:"action",     url:"https://xxpwnxxx420lord.github.io/Barnical-Extended-Games/ULTRAKILL%20Offline%20Download.html" },
-  { name:"Adventures with Anxiety",  icon:"😰", cat:"casual",     url:"https://xxpwnxxx420lord.github.io/b2/anxiety-gh-pages/index.html" },
-  { name:"Oneshot",                  icon:"🌟", cat:"platformer", url:"https://67-factory.github.io/oneshotthing/" },
-];
+        // Initial alphabetical sorting
+        buttonContainer.innerHTML = "";
+        sortButtons(allButtons).forEach(btn => buttonContainer.appendChild(btn));
 
-const board   = document.getElementById('board');
-const countEl = document.getElementById('count');
-const empty   = document.getElementById('empty');
-const search  = document.getElementById('search');
-const btns    = document.querySelectorAll('.filter-btn');
+        function openDictionary(dictionaryURL) {
+            window.location.href = dictionaryURL;
+        }
 
-let cat = 'all', q = '';
+        buttons.forEach((button) => {
+            button.addEventListener("click", function () {
+                const action = button.dataset.action;
+                switch (action) {
+                    case "action1": openDictionary("/Games/Bitlife/index.html"); break;
+                    case "action2": openDictionary("/Games/1v1.lol/index.html"); break;
+                    case "action3": openDictionary("/Games/Amongus/index.html"); break;
+                    case "action4": openDictionary("/Games/atr3/index.html"); break;
+                    case "action5": openDictionary("/Games/slope/index.html"); break;
+                    case "action7": openDictionary("/Games/clumsy-bird-master/index.html"); break;
+                    case "action8": openDictionary("/Games/Cookie-Clicker-Source-Code-master/index.html"); break;
+                    case "action9": openDictionary("/Games/canvas-tetris-master/canvas-tetris-master/index.html"); break;
+                    case "action10": openDictionary("/Games/Dog/index.html"); break;
+                    case "action14": openDictionary("/Games/pm.html"); break;
+                    case "action16": openDictionary("/Games/Bee-Swarm-Simulator/index.html"); break;
+                    case "action18": openDictionary("/Games/mc.html"); break;
+                    case "action19": openDictionary("/Games/geodash.html"); break;
+                    case "action20": openDictionary("/Games/CrossyRoad/index.html"); break;
+                    case "action22": openDictionary("/Games/Subway/index.html"); break;
+                    case "action23": openDictionary("/Games/tic tac toe/index.html"); break;
+                    case "action24": openDictionary("/Games/dino.html"); break;
+                    case "action26": openDictionary("/Games/3d.city/index.html"); break;
+                    case "action27": openDictionary("/Games/particleclicker/index.html"); break;
+                    case "action28": openDictionary("/Games/Thehousegame/the-house-game-gh-pages/index.html"); break;
+                    case "action29": openDictionary("/Games/Cube-engine-master/play.htm"); break;
+                    case "action30": openDictionary("/Games/URLchess-master/index.html"); break;
+                    case "action31": openDictionary("/Games/asteroids-game-master/index.html"); break;
+                    case "action32": openDictionary("/Games/Fifteen_puzzle_maker-main/index.html"); break;
+                    case "action33": openDictionary("/Games/Anime-Clicker-1.0.2-master/index.html"); break;
+                    case "action34": openDictionary("/Games/doge miner/index.html"); break;
+                    case "action35": openDictionary("/Games/Slope 2/index.html"); break;
+                    case "action36": openDictionary("/Upgraded/getting-over-it/index.html"); break;
+                    case "action38": openDictionary("/Games/tower_game-master/index.html"); break;
+                    case "action39": openDictionary("/Games/Stickman-Hook/index.html"); break;
+                    case "action40": openDictionary("/Games/Worlds-Hardest-Game/index.html"); break;
+                    case "action41": openDictionary("/Games/bob-the-robber-2/index.html"); break;
+                    case "action42": openDictionary("/Games/Bedwars.html"); break;
+                    case "action43": openDictionary("/Games/fifa17packopener.html"); break;
+                    case "action44": openDictionary("/Games/psx.html"); break;
+                    case "action45": openDictionary("/Games/playlists-generator-main/index.html"); break;
+                    case "action46": openDictionary("/Games/blockblast.html"); break;
+                    case "action47": openDictionary("/Games/birthdayguesser.html"); break;
+                    case "action48": openDictionary("https://xxpwnxxx420lord.github.io/b2/repo.html"); break;
+                    case "action50": openDictionary("/Upgraded/bendy/index.html"); break;
+                    case "action52": openDictionary("/Upgraded/bloodmoney/index.html"); break;
+                    case "action53": openDictionary("/Upgraded/buckshot-roulette/index.html"); break;
+                    case "action54": openDictionary("/Upgraded/class-of-09"); break;
+                    case "action55": openDictionary("/Upgraded/getting-over-it"); break;
+                    case "action56": openDictionary("/Upgraded/hollow knight"); break;
+                    case "action57": openDictionary("http://xxpwnxxx420lord.github.io/b2/PeoplePlaygroundBetter.html"); break;
+                    case "action58": openDictionary("/Upgraded/pizza tower"); break;
+                    case "action59": openDictionary("/Upgraded/undertale-yellow"); break;
+                    case "action60": openDictionary("/Games/bad parenting/index.html"); break;
+                    case "action62": openDictionary("https://xxpwnxxx420lord.github.io/Barnical-Extended-Games/Cup/index.html"); break;
+                    case "action63": openDictionary("https://xxpwnxxx420lord.github.io/Barnical-Extended-Games/FNF/index.html"); break;
+                    case "action64": openDictionary("https://xxpwnxxx420lord.github.io/Barnical-Extended-Games/Milkson-Karlson/index.html"); break;
+                    case "action65": openDictionary("https://xxpwnxxx420lord.github.io/Barnical-Extended-Games/rocket-league/index.html"); break;
+                    case "action66": openDictionary("https://xxpwnxxx420lord.github.io/Barnical-Extended-Games/superhot/index.html"); break;
+                    case "action676776": openDictionary("https://xxpwnxxx420lord.github.io/Barnical-Extended-Games/ULTRAKILL%20Offline%20Download.html"); break;
+                    case "bazinga2": openDictionary("https://xxpwnxxx420lord.github.io/b2/anxiety-gh-pages/index.html"); break;
+                    case "Myfavouritegame": openDictionary("https://67-factory.github.io/oneshotthing/"); break;
+                    default: break;
+                }
+            });
+        });
+    </script>
 
-function render() {
-  const term = q.trim().toLowerCase();
-  const list = GAMES.filter(g =>
-    (cat === 'all' || g.cat === cat) &&
-    (!term || g.name.toLowerCase().includes(term))
-  );
-
-  board.innerHTML = '';
-  countEl.textContent = list.length;
-
-  if (!list.length) { empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-
-  list.forEach((g, i) => {
-    const note = document.createElement('div');
-    note.className = 'note';
-    note.dataset.cat = g.cat;
-    note.style.animationDelay = `${i * 0.03}s`;
-
-    // alternate between hole punch and pin in markup
-    const topEl = (i % 4 === 3)
-      ? `<div class="pin"></div>`
-      : `<div class="hole"></div>`;
-    const tapeEl = (i % 5 === 1) ? `<div class="tape"></div>` : '';
-
-    note.innerHTML = `
-      ${topEl}
-      ${tapeEl}
-      <div class="note-inner">
-        <div class="note-content">
-          <div class="note-icon">${g.icon}</div>
-          <div class="note-name">${g.name}</div>
-          <div class="note-cat">${g.cat}</div>
-        </div>
-      </div>`;
-    note.onclick = () => window.location.href = g.url;
-    board.appendChild(note);
-  });
-}
-
-btns.forEach(b => b.addEventListener('click', () => {
-  btns.forEach(x => x.classList.remove('active'));
-  b.classList.add('active');
-  cat = b.dataset.cat;
-  render();
-}));
-
-search.addEventListener('input', e => { q = e.target.value; render(); });
-render();
-</script>
 </body>
 </html>
