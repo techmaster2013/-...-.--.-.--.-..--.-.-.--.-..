@@ -18,4 +18,4 @@
 3. Start playing instantly.
 
 ---
-**Maintained by:** [Syntaxical](https://github.com/xxpwnxxx420lord)
+**Maintained by:** ~~[Syntaxical](https://github.com/xxpwnxxx420lord)~~ techmaster2013 because Syntaxical took down Barnical.
